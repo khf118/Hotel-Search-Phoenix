@@ -1,4 +1,4 @@
-# Kaligo
+# Hotel Search with Phoenix
 
 To start your Phoenix app:
 
@@ -7,7 +7,7 @@ To start your Phoenix app:
   * Install Node.js dependencies with `npm install`
   * Start Phoenix endpoint with `mix phoenix.server`
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+Endpoint: domain.com/api/search?checkin=29-04-2017&checkout=03-05-2017&destination=singapore&guests=3&suppliers=supplier1,supplier2
 
 Ready to run in production? Please [check our deployment guides](http://www.phoenixframework.org/docs/deployment).
 
