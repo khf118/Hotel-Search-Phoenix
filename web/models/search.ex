@@ -1,7 +1,7 @@
 defmodule Kaligo.Search do
   use Kaligo.Web, :model
 
-  schema "todos" do
+  schema "searchs" do
     field :description, :string
 
     timestamps()

@@ -14,6 +14,7 @@ defmodule Kaligo do
       supervisor(Kaligo.Endpoint, []),
       # Start your own worker by calling: Kaligo.Worker.start_link(arg1, arg2, arg3)
       # worker(Kaligo.Worker, [arg1, arg2, arg3]),
+      worker(Cachex, [:searchcache, []])
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

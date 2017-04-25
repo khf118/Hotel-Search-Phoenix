@@ -11,14 +11,12 @@ defmodule Kaligo.SearchController do
      "supplier3" => 'https://api.myjson.com/bins/15ktg'
     }
     
-    #Set the cookie key
-    _cookie_key= Enum.join([_params["destination"],_params["checkin"],_params["checkout"],_params["guests"]],"")
-    conn= Plug.Conn.fetch_cookies(conn)
-    
-    #Check if we already have the search query result in the cookies
-    if conn.cookies[_cookie_key]!=nil do
-      map= Poison.decode!(elem(Base.decode64(conn.cookies[_cookie_key]),1))
-      IO.inspect "retrieving from cookies"
+    #Set the cache key
+    _cache_key= Enum.join([_params["destination"],_params["checkin"],_params["checkout"],_params["guests"]],"")
+    #Check if we already have the search query result in the cache
+    if Cachex.get!(:searchcache, _cache_key)!=nil do
+      map= Cachex.get!(:searchcache, _cache_key)
+      IO.inspect "retrieving from cache"
     else
       #otherwise
       #in case we recieve the requested suppliers in the request, we fetch them into an array
@@ -47,8 +45,8 @@ defmodule Kaligo.SearchController do
       end
       #we format the results by removing the keys
       map= Enum.map(map, fn({key,value}) -> value end)
-      #we save the query result in a cookie
-      conn= put_resp_cookie(conn, _cookie_key, Base.encode64(Poison.encode!(map)),max_age: 5*60 )
+      #we save the query result in a cache
+      Cachex.set!(:searchcache,  _cache_key , map, [ ttl: 5*60000 ])
     end
     render(conn, "index.json", results: map)
   end
