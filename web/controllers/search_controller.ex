@@ -4,6 +4,13 @@ defmodule Kaligo.SearchController do
   alias Kaligo.Search
 
   def index(conn, _params) do
+    #validation
+    if _params["destination"] == nil || _params["checkin"] == nil || _params["checkout"] == nil || _params["guests"] == nil do
+      conn
+      |> put_status(500)
+      |> render("error.json", errors: "Missing required fields.")
+    end
+
     #Set the suppliers
     suppliers= %{
      "supplier1" => 'https://api.myjson.com/bins/2tlb8',
@@ -31,6 +38,13 @@ defmodule Kaligo.SearchController do
       map = %{}
       #we map through the suppliers and call the endpoints one by one
       map = Enum.reduce _suppliers, %{}, fn x, map ->
+        #check first that the requested supplier exist
+        if suppliers[x] == nil do
+          conn
+            |> put_status(500)
+            |> render("error.json", errors: "One of the submitted suppliers wasn't found.")
+        end
+        # we call the supplier api to retrieve the results
         searchQuery= HTTPoison.get! suppliers[x]
         #foreach supplier we map through the results
         map= Enum.reduce elem(Poison.decode(searchQuery.body),1), map, fn y, acc2 ->
@@ -48,7 +62,8 @@ defmodule Kaligo.SearchController do
       #we save the query result in a cache
       Cachex.set!(:searchcache,  _cache_key , map, [ ttl: 5*60000 ])
     end
-    render(conn, "index.json", results: map)
+    conn
+      |> render("index.json", results: map)
   end
 
 

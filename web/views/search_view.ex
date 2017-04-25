@@ -5,4 +5,8 @@ defmodule Kaligo.SearchView do
   	results
   end
 
+  def render("error.json", %{errors: message}) do
+  	%{errors: message}
+  end
+
 end
